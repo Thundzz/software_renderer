@@ -1,32 +1,39 @@
-extern crate sdl2; 
+mod star;
+mod renderer;
+mod bitmap;
+
+
+use std::time::Duration;
 
 use sdl2::pixels::Color;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
-use std::time::Duration;
- 
+use sdl2::rect::Point;
+use sdl2::video::Window;
+
 pub fn main() {
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
  
-    let window = video_subsystem.window("rust-sdl2 demo", 800, 600)
+    let window: Window = video_subsystem.window("rust-sdl2 demo", 800, 600)
         .position_centered()
         .build()
         .unwrap();
- 
+
+
     let mut canvas = window.into_canvas().build().unwrap();
  
-    canvas.set_draw_color(Color::RGB(0, 255, 255));
-    canvas.clear();
-    canvas.present();
+    // canvas.set_draw_color(Color::RGB(0, 255, 255));
+    // canvas.clear();
+    // canvas.present();
     let mut event_pump = sdl_context.event_pump().unwrap();
 
     let mut j : u16 = 0;
     'running: loop {
     	j = (j + 1) % 255;
         let i : u8 = j as u8;
-        println!("{}", i);
-        canvas.set_draw_color(Color::RGB(i, 64, 255 - i));
+        // println!("{}", i);
+        canvas.set_draw_color(Color::RGB(0, 0, 0));
         canvas.clear();
         for event in event_pump.poll_iter() {
             match event {
@@ -39,7 +46,22 @@ pub fn main() {
         }
         // The rest of the game loop goes here...
 
+        let starfield : star::StarField = star::StarField::new_star_field();
+        let mut i : i32 = 0;
+        canvas.set_draw_color(Color::RGB(255, 255, 255));
+
+        for star in starfield.stars.iter() {
+            let point = Point::new(i, i + j as i32);
+            let res = canvas.draw_point(point); 
+            i += 1;
+        }
+
         canvas.present();
         ::std::thread::sleep(Duration::new(0, 100_000_000u32 / 60));
     }
 }
+
+
+
+
+
