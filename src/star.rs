@@ -1,27 +1,37 @@
+use rand::{thread_rng, Rng};
 
 #[derive(Copy, Clone)]
 pub struct Star {
-    pub x : i32,
-    pub y : i32,
-    pub z : i32
+    pub x : f64,
+    pub y : f64,
+    pub z : f64
 }
 
 impl Star {
 
     pub fn new() -> Self {
-        Star { x : 0, y: 0, z : 0 }
+        let x: f64 = thread_rng().gen_range(-0., 1.);
+        let y: f64 = thread_rng().gen_range(-0., 1.);
+        let z: f64 = thread_rng().gen_range(-0., 1.);
+
+        Star { x : x, y: y, z : z }
     }
 }
 
-#[derive(Copy, Clone)]
 pub struct StarField {
-    pub stars: [Star; 1024]
+    pub stars: Vec<Star>
 
 }
 
 impl StarField {
     pub fn new_star_field() -> StarField {
-        return StarField { stars : [Star::new(); 1024] };
+
+        let mut stars = Vec::new();
+        for i in 0..1024 {
+            stars.push(Star::new());
+        }
+        return StarField { stars : stars };
     }
+
 }
 

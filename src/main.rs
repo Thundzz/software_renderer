@@ -4,12 +4,13 @@ mod bitmap;
 
 
 use std::time::Duration;
-
 use sdl2::pixels::Color;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::rect::Point;
 use sdl2::video::Window;
+
+
 
 pub fn main() {
     let sdl_context = sdl2::init().unwrap();
@@ -28,10 +29,14 @@ pub fn main() {
     // canvas.present();
     let mut event_pump = sdl_context.event_pump().unwrap();
 
-    let mut j : u16 = 0;
+    let renderer = renderer::MyRenderer { };
+
+    let mut starfield : star::StarField = star::StarField::new_star_field();
+    let mut bm : bitmap::BitMap = bitmap::BitMap::new(800, 600);
+
     'running: loop {
-    	j = (j + 1) % 255;
-        let i : u8 = j as u8;
+
+
         // println!("{}", i);
         canvas.set_draw_color(Color::RGB(0, 0, 0));
         canvas.clear();
@@ -46,18 +51,31 @@ pub fn main() {
         }
         // The rest of the game loop goes here...
 
-        let starfield : star::StarField = star::StarField::new_star_field();
-        let mut i : i32 = 0;
-        canvas.set_draw_color(Color::RGB(255, 255, 255));
+        //canvas.set_draw_color(Color::RGB(255, 255, 255));
 
-        for star in starfield.stars.iter() {
-            let point = Point::new(i, i + j as i32);
-            let res = canvas.draw_point(point); 
-            i += 1;
+        for i in 0..starfield.stars.len() {
+            // let point = Point::new(i, i + j as i32);
+            //println!("{} {}", x, y);
+            let star = starfield.stars[i];
+            starfield.stars[i] = star::Star { x : star.x, y : star.y + 0.001, z: star.z }
         }
+        renderer::MyRenderer::render(&starfield, &mut bm);
 
+        let width = bm.width;
+        let height = bm.height;
+
+        for x in 0..width {
+            for y in 0..height {
+                let color = bm.get(x, y);
+                canvas.set_draw_color(color);
+                let point = Point::new(x, y);
+                let res = canvas.draw_point(point);
+            }
+        }
+        //println!("{} {} {}", color.r,  color.g, color.b);
         canvas.present();
-        ::std::thread::sleep(Duration::new(0, 100_000_000u32 / 60));
+
+        ::std::thread::sleep(Duration::new(0, 16_000_000u32 / 60));
     }
 }
 
