@@ -16,7 +16,7 @@ pub fn main() {
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
  
-    let window: Window = video_subsystem.window("rust-sdl2 demo", 1024, 1024)
+    let window: Window = video_subsystem.window("rust-sdl2 demo", 1024, 720)
         .position_centered()
         .build()
         .unwrap();
@@ -36,7 +36,7 @@ pub fn main() {
 
     'running: loop {
 
-        let mut bm : bitmap::BitMap = bitmap::BitMap::new(1024, 1024);
+        let mut bm : bitmap::BitMap = bitmap::BitMap::new(1024, 720);
 
 
         // Scan events
@@ -59,7 +59,7 @@ pub fn main() {
         // Move stars
         for i in 0..starfield.stars.len() {
             let star = starfield.stars[i];
-            starfield.stars[i] = star::Star { x : star.x, y : star.y + 0.0015, z: star.z }
+            starfield.stars[i] = star::Star { x : star.x, y : star.y + 0.002, z: star.z }
         }
         //println!("{:?}", starfield.stars.len());
 

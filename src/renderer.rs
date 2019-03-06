@@ -8,7 +8,7 @@ pub struct MyRenderer;
 impl MyRenderer  {
     pub fn render<'a, 'b>(star_field: &'a StarField, bitmap : &'b mut BitMap) -> &'b BitMap {
         let width = 1024;
-        let height = 1024;
+        let height = 720;
 
         let white_pixel = sdl2::pixels::Color::RGB(255, 255,255);
 
