@@ -1,13 +1,13 @@
 
 
 pub struct BitMap {
-    pub width : i32,
-    pub height : i32,
+    pub width : u32,
+    pub height : u32,
     pub  pixels : Vec<sdl2::pixels::Color>
 }
 
 impl BitMap {
-    pub fn new(_width : i32, _height : i32) -> Self {
+    pub fn new(_width : u32, _height : u32) -> Self {
         let size  = (_width * _height) as usize;
         BitMap {
             width : _width,
@@ -16,14 +16,24 @@ impl BitMap {
         }
     }
 
-    pub fn get(&self, x : i32, y : i32) -> sdl2::pixels::Color {
-        let index: usize = (y * self.height + x) as usize;
+    pub fn get(&self, x : u32, y : u32) -> sdl2::pixels::Color {
+        let index: usize = (y * self.width + x) as usize;
         return self.pixels[index];
     }
 
-    pub fn replace(&mut self, x : i32, y : i32, color : sdl2::pixels::Color) -> &Self {
-        let index: usize = (y * self.height + x) as usize;
+    pub fn replace(&mut self, x : u32, y : u32, color : sdl2::pixels::Color) -> &Self {
+        let index: usize = (y * self.width + x) as usize;
         self.pixels[index] = color;
+        return self;
+    }
+
+    pub fn clear(&mut self, color: sdl2::pixels::Color) -> &Self {
+        for x in 0..self.width {
+            for y in 0..self.height {
+                let index: usize = (y * self.width + x) as usize;
+                self.pixels[index] = color;
+            }
+        }
         return self;
     }
 }

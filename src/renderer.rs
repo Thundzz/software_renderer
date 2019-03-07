@@ -6,18 +6,25 @@ pub struct MyRenderer;
 
 
 impl MyRenderer  {
-    pub fn render<'a, 'b>(star_field: &'a StarField, bitmap : &'b mut BitMap) -> &'b BitMap {
-        let width = 1024;
-        let height = 720;
+    
+    pub fn render<'a, 'b>(star_field: &'a StarField, bitmap : &'b mut BitMap, _width : u32, _height : u32) -> &'b BitMap {
+        let width = _width as f64;
+        let height = _height as f64;
+
+        let halfWidth : f64 = width / 2.0 as f64;
+        let halfHeight : f64 = height / 2.0 as f64;
 
         let white_pixel = sdl2::pixels::Color::RGB(255, 255,255);
 
         for star in star_field.stars.iter() {
 
-            let x = (star.x * width as f64).floor() as i32;
-            let y = (star.y * height as f64).floor() as i32;
+            let x = (star.x / star.z) * halfWidth + halfWidth  as f64;
+            let y = (star.y / star.z) * halfHeight + halfHeight as f64;
             //println!("{} {}", x, y);
-            bitmap.replace(x, y % height, white_pixel);
+
+            if (x >= 0.0 && x < width) && (y >= 0.0 && y < height){
+                bitmap.replace(x.floor() as u32, y.floor() as u32, white_pixel);
+            }
         }
         return bitmap;
     }
