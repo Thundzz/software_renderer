@@ -35,15 +35,21 @@ fn should_stop(event_pump : &mut sdl2::EventPump) -> bool {
 
 pub fn main() {
 
-    let res_x = 1920 as u32;
-    let res_y = 1080 as u32;
+    // let res_x = 1920 as u32;
+    // let res_y = 1080 as u32;
 
-    let nb_stars = 1024;
+    let nb_stars = 3096;
 
-    let speed = 0.01;
+    let speed = 0.02;
 
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
+
+    let display_mode = video_subsystem.current_display_mode(0).unwrap();
+    println!("{:}, {:}, {:}" , display_mode.w, display_mode.h, display_mode.refresh_rate);
+    let res_x = display_mode.w as u32;
+    let res_y = display_mode.h as u32;
+
  
     let window: Window = video_subsystem.window("Super starfield", res_x, res_y)
         .position_centered()
