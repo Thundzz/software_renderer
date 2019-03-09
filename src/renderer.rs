@@ -7,7 +7,7 @@ pub struct MyRenderer;
 
 impl MyRenderer  {
     
-    pub fn render<'a, 'b>(star_field: &'a StarField, bitmap : &'b mut BitMap, _width : u32, _height : u32) -> &'b BitMap {
+    pub fn render<'a, 'b>(star_field: &StarField, bitmap : &'b mut BitMap<'a>, _width : u32, _height : u32) -> &'b mut BitMap<'a> {
         let width = _width as f64;
         let height = _height as f64;
 
