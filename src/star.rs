@@ -27,22 +27,10 @@ impl StarField {
     pub fn new_star_field(nb_stars : u32, spread : f64) -> StarField {
 
         let mut stars = Vec::new();
-        for i in 0..nb_stars {
+        for _ in 0..nb_stars {
             stars.push(Star::random(spread));
         }
         return StarField { stars : stars };
     }
-
-    // fn move_stars(&mut self, starfield : &mut star::StarField) {
-    //     for i in 0..starfield.stars.len() {
-    //         let star = starfield.stars[i];
-    //         let mut new_star = star::Star { x : star.x, y : star.y, z: star.z - 0.8 };
-    //         if new_star.z <= 0.0 {
-    //             new_star = star::Star::random();
-    //         }
-    //         starfield.stars[i] = new_star;
-    //     }
-    // }
-
 }
 
