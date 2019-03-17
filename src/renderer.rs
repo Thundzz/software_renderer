@@ -20,6 +20,9 @@ impl MyRenderer  {
             let x = (star.x / star.z) * half_width + half_width  as f64;
             let y = (star.y / star.z) * half_height + half_height as f64;
 
+            // let x = (star.x) * half_width + half_width  as f64;
+            // let y = (star.y) * half_height + half_height as f64;
+
             if (x >= 0.0 && x < width) && (y >= 0.0 && y < height){
                 bitmap.replace(x.floor() as u32, y.floor() as u32, white_pixel);
             }

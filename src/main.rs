@@ -10,12 +10,12 @@ use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::video::Window;
 
-fn move_stars(starfield : &mut star::StarField, speed : f64, duration : f64) {
+fn move_stars(starfield : &mut star::StarField, speed : f64, spread : f64, duration : f64) {
     let z_change = speed * duration;
     for i in 0..starfield.stars.len() {
         starfield.stars[i].z -= z_change;
         if starfield.stars[i].z <= 0.0 {
-            starfield.stars[i] = star::Star::random(128.0);
+            starfield.stars[i] = star::Star::random(spread);
         }
     }
 }
@@ -35,20 +35,23 @@ fn should_stop(event_pump : &mut sdl2::EventPump) -> bool {
 
 pub fn main() {
 
-    // let res_x = 1920 as u32;
-    // let res_y = 1080 as u32;
+    let res_x = 1920 as u32;
+    let res_y = 1080 as u32;
 
-    let nb_stars = 3096;
-
-    let speed = 0.02;
+    let nb_stars = 10096;
+    let speed = 0.00016;
+    let spread = 1.0;
 
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
 
     let display_mode = video_subsystem.current_display_mode(0).unwrap();
     println!("{:}, {:}, {:}" , display_mode.w, display_mode.h, display_mode.refresh_rate);
-    let res_x = display_mode.w as u32;
-    let res_y = display_mode.h as u32;
+
+    // let res_x = display_mode.w as u32;
+    // let res_y = display_mode.h as u32;
+    let res_x = 800 as u32;
+    let res_y = 600 as u32;
 
  
     let window: Window = video_subsystem.window("Super starfield", res_x, res_y)
@@ -59,7 +62,7 @@ pub fn main() {
     let mut canvas = window.into_canvas().build().unwrap();
     let mut event_pump = sdl_context.event_pump().unwrap();
 
-    let mut starfield : star::StarField = star::StarField::new_star_field(nb_stars, 128.0);
+    let mut starfield : star::StarField = star::StarField::new_star_field(nb_stars, spread);
     let mut bm :  bitmap::BitMap = bitmap::BitMap::new(res_x, res_y, &mut canvas);
 
     let mut previous_time = PreciseTime::now();
@@ -82,7 +85,7 @@ pub fn main() {
             break 'running;
         }
 
-        move_stars(&mut starfield, speed, delta_millis);
+        move_stars(&mut starfield, speed, spread, delta_millis);
         renderer::MyRenderer::render(&starfield, &mut bm, res_x, res_y);
 
         bm.present();
