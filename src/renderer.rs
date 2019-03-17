@@ -26,14 +26,14 @@ impl Renderer  {
         let vmid = v2;
         let vmax = v3;
         
-        let (vmin, vmax) = if vmin.y > vmax.y { (vmax, vmin) } else { (vmin, vmax) };
-        let (vmid, vmin) = if vmid.y < vmin.y { (vmin, vmid) } else { (vmid, vmin) };
-        let (vmax, vmid) = if vmax.y < vmid.y { (vmid, vmax) } else { (vmax, vmid) };
+        let (vmin, vmax) = if vmin.y() > vmax.y() { (vmax, vmin) } else { (vmin, vmax) };
+        let (vmid, vmin) = if vmid.y() < vmin.y() { (vmin, vmid) } else { (vmid, vmin) };
+        let (vmax, vmid) = if vmax.y() < vmid.y() { (vmid, vmax) } else { (vmax, vmid) };
         
-        let vec1_x = vmid.x as i32 - v1.x as i32;
-        let vec1_y = vmid.y as i32 - v1.y as i32;
-        let vec2_x = vmid.x as i32 - v2.x as i32;
-        let vec2_y = vmid.y as i32 - v2.y as i32;
+        let vec1_x = vmid.x() as i32 - v1.x() as i32;
+        let vec1_y = vmid.y() as i32 - v1.y() as i32;
+        let vec2_x = vmid.x() as i32 - v2.x() as i32;
+        let vec2_y = vmid.y() as i32 - v2.y() as i32;
 
         let det = vec1_x * vec2_y - vec1_y * vec2_x;
         let handedness = if det >= 0 { 0 } else { 1 };
@@ -50,15 +50,15 @@ impl Renderer  {
     
     fn rasterize_line(&mut self, v1 : Vertex, v2 : Vertex, whichside : u32) {
         assert!(whichside == 0 || whichside == 1);
-        let xstart = v1.x as f64;
-        let xend = v2.x as f64;
-        let ystart : f64 = v1.y as f64;
-        let yend : f64 = v2.y as f64;
+        let xstart = v1.x() as f64;
+        let xend = v2.x() as f64;
+        let ystart : f64 = v1.y() as f64;
+        let yend : f64 = v2.y() as f64;
         let xstep : f64 = (xend - xstart) / (yend-ystart);
 
         let mut xcurrent= xstart;
 
-        for y in v1.y..v2.y {
+        for y in v1.y()..v2.y() {
             self.scan_buffer[(2*y + whichside) as usize] = xcurrent.floor() as u32;
             xcurrent += xstep;
         }

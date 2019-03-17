@@ -64,13 +64,13 @@ pub fn main() {
     let mut previous_time = PreciseTime::now();
 
 
-    let v1 = Vertex { x : 100, y : 100 };
-    let v2 = Vertex { x : 250, y : 200 };
-    let v3 = Vertex { x : 50 , y : 350 };
+    let v1 = Vertex::new(100.0,  100.0);
+    let v2 = Vertex::new(250.0,  200.0);
+    let v3 = Vertex::new(50.0,   350.0);
 
-    let v4 = Vertex { x : 500, y : 100 };
-    let v5 = Vertex { x : 750, y : 200 };
-    let v6 = Vertex { x : 550 , y : 350 };
+    let v4 = Vertex::new(500.0,  100.0);
+    let v5 = Vertex::new(750.0,  200.0);
+    let v6 = Vertex::new(550.0,  350.0);
 
     'running: loop {
         let current_time = PreciseTime::now();
