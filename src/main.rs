@@ -4,12 +4,14 @@ mod renderer;
 mod bitmap;
 mod vertex;
 
+use std::time::{ Duration };
 use time::{ PreciseTime };
 use sdl2::pixels::Color;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 use sdl2::video::Window;
 use sdl2::VideoSubsystem;
+use glm::Mat4;
 
 use crate::renderer::Renderer;
 use crate::bitmap::BitMap;
@@ -64,23 +66,40 @@ pub fn main() {
     let mut previous_time = PreciseTime::now();
 
 
-    let v1 = Vertex::new(100.0,  100.0);
-    let v2 = Vertex::new(250.0,  200.0);
-    let v3 = Vertex::new(50.0,   350.0);
+    // let v1 = Vertex::new(100.0,  100.0);
+    // let v2 = Vertex::new(250.0,  200.0);
+    // let v3 = Vertex::new(50.0,   350.0);
 
-    let v4 = Vertex::new(500.0,  100.0);
-    let v5 = Vertex::new(750.0,  200.0);
-    let v6 = Vertex::new(550.0,  350.0);
+    // let v4 = Vertex::new(500.0,  100.0);
+    // let v5 = Vertex::new(750.0,  200.0);
+    // let v6 = Vertex::new(550.0,  350.0);
 
+    // let v1 = Vertex::new(100.0 / res_x as f32,  100.0 / res_y as f32);
+    // let v2 = Vertex::new(250.0 / res_x as f32,  200.0 / res_y as f32);
+    // let v3 = Vertex::new(50.0  / res_x as f32,  350.0 / res_y as f32);
+
+    let v1 = Vertex::new(-1.0, -1.0, 0.0);
+    let v2 = Vertex::new(0.0 ,  1.0, 0.0);
+    let v3 = Vertex::new(1.0 , -1.0, 0.0);
+
+    let fov_deg = 70.0 as f32;
+    let fov_rad = std::f32::consts::PI * fov_deg / 180.0;
+    let projection : glm::Mat4 = glm::perspective(4.0 / 3.0, fov_rad, 0.1, 100.0);
+    let mut angle = 0.0;
     'running: loop {
         let current_time = PreciseTime::now();
         let delta =  previous_time.to(current_time);
         previous_time = current_time;
 
+        
+
         let delta_nanos = delta.num_nanoseconds().unwrap();
         let delta_millis = delta_nanos as f64 / 1_000_000.0;
 
-        println!("{:?} ms", delta_millis);
+        angle = angle + (delta_millis / 600.0) as f32;
+
+        //println!("{:?} ms", delta_millis);
+        println!("{:?}", angle);
 
         let background_color = Color::RGB(0, 0, 0);
         bm.clear(background_color);
@@ -88,17 +107,27 @@ pub fn main() {
         if should_stop(&mut event_pump){
             break 'running;
         }
+        
+        let id = Mat4::identity();
 
-        renderer.rasterize_triangle(v3, v1, v2);
+        let translate = glm::translate(&id, &glm::vec3(0.0, 0.0, -3.0));
+        let rotation = glm::rotate(&id, angle,  &glm::vec3(0.0, 1.0, 0.0));
+
+        let transform = projection * translate * rotation;
+
+        renderer.rasterize_triangle(
+            v1.transform(transform),
+            v2.transform(transform),
+            v3.transform(transform)
+        );
         renderer.render_scanbuffer(&mut bm);
 
-        renderer.rasterize_triangle(v4, v5, v6);
-        renderer.render_scanbuffer(&mut bm);
-
+        // renderer.rasterize_triangle(v4, v5, v6);
+        // renderer.render_scanbuffer(&mut bm);
 
         bm.present();
 
-        //::std::thread::sleep(Duration::new(0, 500_000));
+        //::std::thread::sleep(Duration::new(0, 500_000_000));
     }
 }
 

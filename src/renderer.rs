@@ -3,6 +3,7 @@ use crate::vertex::Vertex;
 
 use std::f64;
 use std::vec;
+use glm::mat4;
 
 pub struct Renderer
 {
@@ -21,10 +22,21 @@ impl Renderer  {
         }
     }
 
+    fn screen_space_matrix(&self) -> glm::Mat4 {
+        let half_width = self.width as f32 / 2.0;
+        let half_height = self.height as f32 / 2.0;
+        glm::mat4(
+            half_width , 0.0, 0.0, half_width,
+            0.0 , -half_height, 0.0, half_height,
+            0.0 , 0.0, 1.0, 0.0,
+            0.0 , 0.0, 0.0, 1.0,
+        )
+    }
+
     pub fn rasterize_triangle(&mut self, v1 : Vertex, v2 : Vertex, v3 : Vertex) {
-        let vmin = v1;
-        let vmid = v2;
-        let vmax = v3;
+        let vmin = v1.transform(self.screen_space_matrix()).perspective_divide();
+        let vmid = v2.transform(self.screen_space_matrix()).perspective_divide();
+        let vmax = v3.transform(self.screen_space_matrix()).perspective_divide();
         
         let (vmin, vmax) = if vmin.y() > vmax.y() { (vmax, vmin) } else { (vmin, vmax) };
         let (vmid, vmin) = if vmid.y() < vmin.y() { (vmin, vmid) } else { (vmid, vmin) };
@@ -62,14 +74,13 @@ impl Renderer  {
             self.scan_buffer[(2*y + whichside) as usize] = xcurrent.floor() as u32;
             xcurrent += xstep;
         }
-
     }
 
 
     pub fn render_scanbuffer<'a, 'b>(&self, bitmap : &'b mut BitMap<'a>) -> &'b mut BitMap<'a> {
         let white_pixel = sdl2::pixels::Color::RGB(255, 255,255);
 
-        for y in 1..self.height {
+        for y in 0..self.height {
             let xmin = self.scan_buffer[(2*y) as usize];
             let xmax = self.scan_buffer[(2*y +1) as usize];
             for x in xmin..xmax {
