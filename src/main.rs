@@ -50,8 +50,8 @@ pub fn main() {
 
     // let res_x = display_mode.w as u32;
     // let res_y = display_mode.h as u32;
-    let res_x = 800 as u32;
-    let res_y = 600 as u32;
+    // let res_x = 800 as u32;
+    // let res_y = 600 as u32;
 
  
     let window: Window = video_subsystem.window("Super starfield", res_x, res_y)
