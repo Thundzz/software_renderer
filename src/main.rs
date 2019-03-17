@@ -1,10 +1,10 @@
-mod star;
+extern crate nalgebra_glm as glm;
+
 mod renderer;
 mod bitmap;
 mod vertex;
 
 use time::{ PreciseTime };
-use std::time::{ Duration };
 use sdl2::pixels::Color;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
@@ -14,18 +14,6 @@ use sdl2::VideoSubsystem;
 use crate::renderer::Renderer;
 use crate::bitmap::BitMap;
 use crate::vertex::Vertex;
-use crate::star::{  StarField };
-
-
-fn move_stars(starfield : &mut star::StarField, speed : f64, spread : f64, duration : f64) {
-    let z_change = speed * duration;
-    for i in 0..starfield.stars.len() {
-        starfield.stars[i].z -= z_change;
-        if starfield.stars[i].z <= 0.0 {
-            starfield.stars[i] = star::Star::random(spread);
-        }
-    }
-}
 
 fn should_stop(event_pump : &mut sdl2::EventPump) -> bool {
    for event in event_pump.poll_iter() {
@@ -57,10 +45,6 @@ fn resolution(video_subsystem : &VideoSubsystem) -> (u32, u32) {
 
 pub fn main() {
 
-    let nb_stars = 4096;
-    let speed = 0.00016;
-    let spread = 1.0;
-
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
 
@@ -74,7 +58,6 @@ pub fn main() {
     let mut canvas = window.into_canvas().build().unwrap();
     let mut event_pump = sdl_context.event_pump().unwrap();
 
-    let mut starfield = StarField::new_star_field(nb_stars, spread);
     let mut bm = BitMap::new(res_x, res_y, &mut canvas);
     let mut renderer = Renderer::new(res_x, res_y);
 
@@ -98,7 +81,6 @@ pub fn main() {
         let delta_millis = delta_nanos as f64 / 1_000_000.0;
 
         println!("{:?} ms", delta_millis);
-
 
         let background_color = Color::RGB(0, 0, 0);
         bm.clear(background_color);

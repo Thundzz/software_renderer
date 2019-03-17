@@ -1,5 +1,4 @@
 use crate::bitmap::BitMap;
-use crate::star::StarField;
 use crate::vertex::Vertex;
 
 use std::f64;
@@ -22,21 +21,10 @@ impl Renderer  {
         }
     }
 
-    fn to_randians(degrees: f64) -> f64 {
-        f64::consts::PI * degrees / 180.0
-    }
-
-    pub fn set_trapezoid_in_scanbuffer(&mut self) {
-        for y in 50..100 {
-            self.scan_buffer[(2*y) as usize] = 300 - y;
-            self.scan_buffer[(2*y +1) as usize] = 300 + y;
-        }
-    }
-
     pub fn rasterize_triangle(&mut self, v1 : Vertex, v2 : Vertex, v3 : Vertex) {
-        let mut vmin = v1;
-        let mut vmid = v2;
-        let mut vmax = v3;
+        let vmin = v1;
+        let vmid = v2;
+        let vmax = v3;
         
         let (vmin, vmax) = if vmin.y > vmax.y { (vmax, vmin) } else { (vmin, vmax) };
         let (vmid, vmin) = if vmid.y < vmin.y { (vmin, vmid) } else { (vmid, vmin) };
@@ -91,31 +79,4 @@ impl Renderer  {
         bitmap
     }
 
-    pub fn render_starfield<'a, 'b>(&self,
-                          star_field: &StarField, 
-                          bitmap : &'b mut BitMap<'a>) -> &'b mut BitMap<'a> {
-
-        let fov_deg = 170.0;
-        let tan_half_fov = Renderer::to_randians(fov_deg / 2.0).tan();
-
-        let width = self.width as f64;
-        let height = self.height as f64;
-
-        let half_width : f64 = width / 2.0 as f64;
-        let half_height : f64 = height / 2.0 as f64;
-
-        let white_pixel = sdl2::pixels::Color::RGB(255, 255,255);
-
-        for star in star_field.stars.iter() {
-
-            let x = (star.x / (star.z * tan_half_fov)) * half_width + half_width  as f64;
-            let y = (star.y / (star.z * tan_half_fov)) * half_height + half_height as f64;
-
-            if (x >= 0.0 && x < width) && (y >= 0.0 && y < height){
-                bitmap.replace(x.floor() as u32, y.floor() as u32, white_pixel);
-            }
-        }
-
-        bitmap
-    }
 }
