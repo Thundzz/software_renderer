@@ -12,12 +12,7 @@ pub struct Renderer
     scan_buffer : Vec<u32>
 }
 
-enum Handedness {
-
-}
-
 impl Renderer  {
-    
 
     pub fn new(_width : u32, _height : u32) -> Self {
         Renderer { 
@@ -39,9 +34,30 @@ impl Renderer  {
     }
 
     pub fn rasterize_triangle(&mut self, v1 : Vertex, v2 : Vertex, v3 : Vertex) {
-        self.rasterize_line(v1, v2, 0);
-        self.rasterize_line(v1, v3, 1);
-        self.rasterize_line(v3, v2, 1);
+        let mut vmin = v1;
+        let mut vmid = v2;
+        let mut vmax = v3;
+        
+        let (vmin, vmax) = if vmin.y > vmax.y { (vmax, vmin) } else { (vmin, vmax) };
+        let (vmid, vmin) = if vmid.y < vmin.y { (vmin, vmid) } else { (vmid, vmin) };
+        let (vmax, vmid) = if vmax.y < vmid.y { (vmid, vmax) } else { (vmax, vmid) };
+        
+        let vec1_x = vmid.x as i32 - v1.x as i32;
+        let vec1_y = vmid.y as i32 - v1.y as i32;
+        let vec2_x = vmid.x as i32 - v2.x as i32;
+        let vec2_y = vmid.y as i32 - v2.y as i32;
+
+        let det = vec1_x * vec2_y - vec1_y * vec2_x;
+        let handedness = if det >= 0 { 0 } else { 1 };
+        
+        self.rasterize_triangle_ordered(vmin, vmid, vmax, handedness);
+    }
+
+
+    pub fn rasterize_triangle_ordered(&mut self, v1 : Vertex, v2 : Vertex, v3 : Vertex, hand : u32) {
+        self.rasterize_line(v1, v2, 1 - hand);
+        self.rasterize_line(v1, v3, hand);
+        self.rasterize_line(v2, v3, 1 - hand);
     }
     
     fn rasterize_line(&mut self, v1 : Vertex, v2 : Vertex, whichside : u32) {
@@ -75,7 +91,7 @@ impl Renderer  {
         bitmap
     }
 
-    pub fn render<'a, 'b>(&self,
+    pub fn render_starfield<'a, 'b>(&self,
                           star_field: &StarField, 
                           bitmap : &'b mut BitMap<'a>) -> &'b mut BitMap<'a> {
 

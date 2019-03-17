@@ -79,7 +79,16 @@ pub fn main() {
     let mut renderer = Renderer::new(res_x, res_y);
 
     let mut previous_time = PreciseTime::now();
-    
+
+
+    let v1 = Vertex { x : 100, y : 100 };
+    let v2 = Vertex { x : 250, y : 200 };
+    let v3 = Vertex { x : 50 , y : 350 };
+
+    let v4 = Vertex { x : 500, y : 100 };
+    let v5 = Vertex { x : 750, y : 200 };
+    let v6 = Vertex { x : 550 , y : 350 };
+
     'running: loop {
         let current_time = PreciseTime::now();
         let delta =  previous_time.to(current_time);
@@ -98,29 +107,16 @@ pub fn main() {
             break 'running;
         }
 
-        //move_stars(&mut starfield, speed, spread, delta_millis);
-        //renderer.render(&starfield, &mut bm);
-
-        let v1 = Vertex { x : 100, y : 100 };
-        let v2 = Vertex { x : 50 , y : 350 };
-        let v3 = Vertex { x : 250, y : 200 };
-
-        // renderer.set_trapezoid_in_scanbuffer();
-        renderer.rasterize_triangle(v1, v2, v3);
+        renderer.rasterize_triangle(v3, v1, v2);
         renderer.render_scanbuffer(&mut bm);
 
-        let v1 = Vertex { x : 500, y : 100 };
-        let v2 = Vertex { x : 550 , y : 350 };
-        let v3 = Vertex { x : 750, y : 200 };
-
-        // renderer.set_trapezoid_in_scanbuffer();
-        renderer.rasterize_triangle(v1, v2, v3);
+        renderer.rasterize_triangle(v4, v5, v6);
         renderer.render_scanbuffer(&mut bm);
 
 
         bm.present();
 
-        ::std::thread::sleep(Duration::new(0, 500_000));
+        //::std::thread::sleep(Duration::new(0, 500_000));
     }
 }
 
