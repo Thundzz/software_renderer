@@ -70,12 +70,12 @@ pub fn main() {
     let mut previous_time = PreciseTime::now();
 
     let v1 = Vertex::new(-1.0, -1.0, 0.0);
-    let v2 = Vertex::new(1.0 , -1.0, 0.0);
-    let v3 = Vertex::new(0.0 ,  1.0, 0.0);
+    let v2 = Vertex::new(0.0 ,  1.0, 0.0);
+    let v3 = Vertex::new(1.0 ,  -1.0, 0.0);
 
     let fov_deg = 70.0 as f32;
     let fov_rad = std::f32::consts::PI * fov_deg / 180.0;
-    let projection : glm::Mat4 = glm::perspective(4.0 / 3.0, fov_rad, 0.1, 100.0);
+    let projection : glm::Mat4 = glm::perspective_rh_no(4.0 / 3.0, fov_rad, 0.001, 100.0);
     let mut angle_deg = 0 as f32;
 
     'running: loop {
@@ -90,7 +90,7 @@ pub fn main() {
         let angle = deg_to_rad(angle_deg);
         angle_deg = angle_deg + 1.0 ;
 
-        println!("Angle : {:?} took {:?} ms to render.",  angle_deg, delta_millis);
+        //println!("Angle : {:?} took {:?} ms to render.",  angle_deg, delta_millis);
 
         let background_color = Color::RGB(0, 0, 0);
         bm.clear(background_color);
@@ -101,10 +101,20 @@ pub fn main() {
         
         let id = Mat4::identity();
 
+
         let translate = glm::translate(&id, &glm::vec3(0.0, 0.0, -3.0));
         let rotation = glm::rotate(&id, angle,  &glm::vec3(0.0, 1.0, 0.0));
 
         let transform = projection * translate * rotation;
+
+        let v1t = v1.transform(transform);
+        let v2t = v2.transform(transform);
+        let v3t = v3.transform(transform);
+
+        //println!("{:.5} {:.5} {:.5}", v1t.x(), v1t.y(), v1t.z());
+        println!("{:.5} {:.5} {:.5}", v2t.x(), v2t.y(), v2t.z());
+        //println!("{:.5} {:.5} {:.5}", v3t.x(), v3t.y(), v3t.z());
+        
 
         renderer.render_triangle(
             &mut bm,
@@ -113,11 +123,13 @@ pub fn main() {
             v3.transform(transform)
         );
 
-
-
         bm.present();
 
-        // ::std::thread::sleep(Duration::new(0, 50_000_000));
+        let sleep_time : i32 = 16_000_000 - (delta_nanos as i32);
+        // println!("{:?}", sleep_time);
+        if sleep_time > 0 {
+            ::std::thread::sleep(Duration::new(0,  sleep_time as u32));
+        }
     }
 }
 

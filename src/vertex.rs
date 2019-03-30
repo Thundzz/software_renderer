@@ -18,13 +18,18 @@ impl Vertex {
 		}
 	}
 
-	pub fn x(&self) -> u32{
-		self.pos.x.floor() as u32
+	pub fn x(&self) -> f32{
+		self.pos.x as f32
 	}
 
-	pub fn y(&self) -> u32 {
-		self.pos.y.floor() as u32
+	pub fn y(&self) -> f32 {
+		self.pos.y as f32
 	}
+
+	pub fn z(&self) -> f32 {
+		self.pos.z as f32
+	}
+
 
 	pub fn perspective_divide(&self) -> Self {
 		let v = glm::vec4(

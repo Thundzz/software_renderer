@@ -51,7 +51,7 @@ impl Renderer  {
         let handedness = if det >= 0 { 0 } else { 1 };
         
         self.rasterize_triangle_ordered(vmin, vmid, vmax, handedness);
-        self.render_scanbuffer(bitmap, vmin.y(), vmax.y())
+        self.render_scanbuffer(bitmap, vmin.y() as u32, vmax.y() as u32)
     }
 
     fn rasterize_triangle_ordered(&mut self, v1 : Vertex, v2 : Vertex, v3 : Vertex, hand : u32) {
@@ -70,7 +70,10 @@ impl Renderer  {
 
         let mut xcurrent= xstart;
 
-        for y in v1.y()..v2.y() {
+        let start = v1.y() as u32;
+        let end = v2.y() as u32;
+
+        for y in start..end {
             self.scan_buffer[(2*y + whichside) as usize] = xcurrent.floor() as u32;
             xcurrent += xstep;
         }
