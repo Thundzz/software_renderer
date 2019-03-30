@@ -33,7 +33,7 @@ impl Renderer  {
         )
     }
 
-    pub fn rasterize_triangle(&mut self, v1 : Vertex, v2 : Vertex, v3 : Vertex) {
+    pub fn render_triangle<'a, 'b>(&mut self, bitmap : &'b mut BitMap<'a>, v1 : Vertex, v2 : Vertex, v3 : Vertex) -> &'b mut BitMap<'a> {
         let vmin = v1.transform(self.screen_space_matrix()).perspective_divide();
         let vmid = v2.transform(self.screen_space_matrix()).perspective_divide();
         let vmax = v3.transform(self.screen_space_matrix()).perspective_divide();
@@ -42,19 +42,19 @@ impl Renderer  {
         let (vmid, vmin) = if vmid.y() < vmin.y() { (vmin, vmid) } else { (vmid, vmin) };
         let (vmax, vmid) = if vmax.y() < vmid.y() { (vmid, vmax) } else { (vmax, vmid) };
         
-        let vec1_x = vmid.x() as i32 - v1.x() as i32;
-        let vec1_y = vmid.y() as i32 - v1.y() as i32;
-        let vec2_x = vmid.x() as i32 - v2.x() as i32;
-        let vec2_y = vmid.y() as i32 - v2.y() as i32;
+        let vec1_x = vmid.x() as i32 - vmax.x() as i32;
+        let vec1_y = vmid.y() as i32 - vmax.y() as i32;
+        let vec2_x = vmid.x() as i32 - vmin.x() as i32;
+        let vec2_y = vmid.y() as i32 - vmin.y() as i32;
 
         let det = vec1_x * vec2_y - vec1_y * vec2_x;
         let handedness = if det >= 0 { 0 } else { 1 };
         
         self.rasterize_triangle_ordered(vmin, vmid, vmax, handedness);
+        self.render_scanbuffer(bitmap, vmin.y(), vmax.y())
     }
 
-
-    pub fn rasterize_triangle_ordered(&mut self, v1 : Vertex, v2 : Vertex, v3 : Vertex, hand : u32) {
+    fn rasterize_triangle_ordered(&mut self, v1 : Vertex, v2 : Vertex, v3 : Vertex, hand : u32) {
         self.rasterize_line(v1, v2, 1 - hand);
         self.rasterize_line(v1, v3, hand);
         self.rasterize_line(v2, v3, 1 - hand);
@@ -77,10 +77,10 @@ impl Renderer  {
     }
 
 
-    pub fn render_scanbuffer<'a, 'b>(&self, bitmap : &'b mut BitMap<'a>) -> &'b mut BitMap<'a> {
+    pub fn render_scanbuffer<'a, 'b>(&self, bitmap : &'b mut BitMap<'a>, ymin : u32, ymax : u32) -> &'b mut BitMap<'a> {
         let white_pixel = sdl2::pixels::Color::RGB(255, 255,255);
 
-        for y in 0..self.height {
+        for y in ymin..ymax {
             let xmin = self.scan_buffer[(2*y) as usize];
             let xmax = self.scan_buffer[(2*y +1) as usize];
             for x in xmin..xmax {

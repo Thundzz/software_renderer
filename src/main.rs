@@ -30,6 +30,10 @@ fn should_stop(event_pump : &mut sdl2::EventPump) -> bool {
     return false;
 }
 
+fn deg_to_rad(deg : f32) -> f32 {
+    deg * std::f32::consts::PI / 180.0
+}
+
 fn resolution(video_subsystem : &VideoSubsystem) -> (u32, u32) {
 
     let display_mode = video_subsystem.current_display_mode(0).unwrap();
@@ -65,41 +69,28 @@ pub fn main() {
 
     let mut previous_time = PreciseTime::now();
 
-
-    // let v1 = Vertex::new(100.0,  100.0);
-    // let v2 = Vertex::new(250.0,  200.0);
-    // let v3 = Vertex::new(50.0,   350.0);
-
-    // let v4 = Vertex::new(500.0,  100.0);
-    // let v5 = Vertex::new(750.0,  200.0);
-    // let v6 = Vertex::new(550.0,  350.0);
-
-    // let v1 = Vertex::new(100.0 / res_x as f32,  100.0 / res_y as f32);
-    // let v2 = Vertex::new(250.0 / res_x as f32,  200.0 / res_y as f32);
-    // let v3 = Vertex::new(50.0  / res_x as f32,  350.0 / res_y as f32);
-
     let v1 = Vertex::new(-1.0, -1.0, 0.0);
-    let v2 = Vertex::new(0.0 ,  1.0, 0.0);
-    let v3 = Vertex::new(1.0 , -1.0, 0.0);
+    let v2 = Vertex::new(1.0 , -1.0, 0.0);
+    let v3 = Vertex::new(0.0 ,  1.0, 0.0);
 
     let fov_deg = 70.0 as f32;
     let fov_rad = std::f32::consts::PI * fov_deg / 180.0;
     let projection : glm::Mat4 = glm::perspective(4.0 / 3.0, fov_rad, 0.1, 100.0);
-    let mut angle = 0.0;
+    let mut angle_deg = 0 as f32;
+
     'running: loop {
         let current_time = PreciseTime::now();
         let delta =  previous_time.to(current_time);
         previous_time = current_time;
 
         
-
         let delta_nanos = delta.num_nanoseconds().unwrap();
         let delta_millis = delta_nanos as f64 / 1_000_000.0;
 
-        angle = angle + (delta_millis / 600.0) as f32;
+        let angle = deg_to_rad(angle_deg);
+        angle_deg = angle_deg + 1.0 ;
 
-        //println!("{:?} ms", delta_millis);
-        println!("{:?}", angle);
+        println!("Angle : {:?} took {:?} ms to render.",  angle_deg, delta_millis);
 
         let background_color = Color::RGB(0, 0, 0);
         bm.clear(background_color);
@@ -115,19 +106,18 @@ pub fn main() {
 
         let transform = projection * translate * rotation;
 
-        renderer.rasterize_triangle(
+        renderer.render_triangle(
+            &mut bm,
             v1.transform(transform),
             v2.transform(transform),
             v3.transform(transform)
         );
-        renderer.render_scanbuffer(&mut bm);
 
-        // renderer.rasterize_triangle(v4, v5, v6);
-        // renderer.render_scanbuffer(&mut bm);
+
 
         bm.present();
 
-        //::std::thread::sleep(Duration::new(0, 500_000_000));
+        // ::std::thread::sleep(Duration::new(0, 50_000_000));
     }
 }
 
