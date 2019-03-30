@@ -76,7 +76,7 @@ pub fn main() {
     let fov_deg = 70.0 as f32;
     let fov_rad = std::f32::consts::PI * fov_deg / 180.0;
     let projection : glm::Mat4 = glm::perspective_rh_no(4.0 / 3.0, fov_rad, 0.001, 100.0);
-    let mut angle_deg = 0 as f32;
+    let mut angle_deg = 90 as f32;
 
     'running: loop {
         let current_time = PreciseTime::now();
@@ -106,15 +106,6 @@ pub fn main() {
         let rotation = glm::rotate(&id, angle,  &glm::vec3(0.0, 1.0, 0.0));
 
         let transform = projection * translate * rotation;
-
-        let v1t = v1.transform(transform);
-        let v2t = v2.transform(transform);
-        let v3t = v3.transform(transform);
-
-        //println!("{:.5} {:.5} {:.5}", v1t.x(), v1t.y(), v1t.z());
-        println!("{:.5} {:.5} {:.5}", v2t.x(), v2t.y(), v2t.z());
-        //println!("{:.5} {:.5} {:.5}", v3t.x(), v3t.y(), v3t.z());
-        
 
         renderer.render_triangle(
             &mut bm,

@@ -42,39 +42,42 @@ impl Renderer  {
         let (vmid, vmin) = if vmid.y() < vmin.y() { (vmin, vmid) } else { (vmid, vmin) };
         let (vmax, vmid) = if vmax.y() < vmid.y() { (vmid, vmax) } else { (vmax, vmid) };
         
-        let vec1_x = vmid.x() as i32 - vmax.x() as i32;
-        let vec1_y = vmid.y() as i32 - vmax.y() as i32;
-        let vec2_x = vmid.x() as i32 - vmin.x() as i32;
-        let vec2_y = vmid.y() as i32 - vmin.y() as i32;
+        let vec1_x = vmid.x() - vmax.x();
+        let vec1_y = vmid.y() - vmax.y();
+        let vec2_x = vmid.x() - vmin.x();
+        let vec2_y = vmid.y() - vmin.y();
 
         let det = vec1_x * vec2_y - vec1_y * vec2_x;
-        let handedness = if det >= 0 { 0 } else { 1 };
+        let handedness = if det >= 0.0 { 0 } else { 1 };
         
         self.rasterize_triangle_ordered(vmin, vmid, vmax, handedness);
-        self.render_scanbuffer(bitmap, vmin.y() as u32, vmax.y() as u32)
+        self.render_scanbuffer(bitmap, vmin.y().ceil() as u32, vmax.y().ceil() as u32)
     }
 
     fn rasterize_triangle_ordered(&mut self, v1 : Vertex, v2 : Vertex, v3 : Vertex, hand : u32) {
-        self.rasterize_line(v1, v2, 1 - hand);
-        self.rasterize_line(v1, v3, hand);
-        self.rasterize_line(v2, v3, 1 - hand);
+        self.scan_convert_line(v1, v2, 1 - hand);
+        self.scan_convert_line(v1, v3, hand);
+        self.scan_convert_line(v2, v3, 1 - hand);
     }
     
-    fn rasterize_line(&mut self, v1 : Vertex, v2 : Vertex, whichside : u32) {
+    fn scan_convert_line(&mut self, min_v : Vertex, max_v : Vertex, whichside : u32) {
+
         assert!(whichside == 0 || whichside == 1);
-        let xstart = v1.x() as f64;
-        let xend = v2.x() as f64;
-        let ystart : f64 = v1.y() as f64;
-        let yend : f64 = v2.y() as f64;
-        let xstep : f64 = (xend - xstart) / (yend-ystart);
+        let ystart  : u32 = min_v.y().ceil() as u32;
+        let yend : u32 = max_v.y().ceil() as u32;
 
-        let mut xcurrent= xstart;
+        if yend == ystart {
+            return;
+            
+        }
+        
+        let xstep : f32 = (max_v.x() - min_v.x()) / (max_v.y() - min_v.y());
+        let y_prestep : f32 = (ystart as f32) - min_v.y();
+        let mut xcurrent : f32 = min_v.x() + xstep * y_prestep;
 
-        let start = v1.y() as u32;
-        let end = v2.y() as u32;
 
-        for y in start..end {
-            self.scan_buffer[(2*y + whichside) as usize] = xcurrent.floor() as u32;
+        for y in ystart..yend {
+            self.scan_buffer[(2*y + whichside) as usize] = xcurrent.ceil() as u32;
             xcurrent += xstep;
         }
     }
