@@ -4,7 +4,7 @@
 
 A basic software renderer written in gif.
 
-!img/triangle.gif!
+![Spinning triangle](img/triangle.gif)
 
 For the moment only renders a rotating triangle, but should get more intersting in the future.
 
