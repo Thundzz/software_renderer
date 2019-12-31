@@ -2,7 +2,7 @@
 
 ## What is this ?
 
-A basic software renderer written in gif.
+A basic software renderer written in [Rust](https://www.rust-lang.org/).
 
 ![Spinning triangle](img/triangle.gif)
 
