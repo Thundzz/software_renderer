@@ -1,9 +1,7 @@
 use crate::bitmap::BitMap;
 use crate::vertex::Vertex;
 
-use std::f64;
 use std::vec;
-use glm::mat4;
 
 pub struct Renderer
 {
@@ -15,8 +13,8 @@ pub struct Renderer
 impl Renderer  {
 
     pub fn new(_width : u32, _height : u32) -> Self {
-        Renderer { 
-            width : _width, 
+        Renderer {
+            width : _width,
             height : _height,
             scan_buffer : vec![0; 2*_height as usize]
         }
@@ -37,11 +35,11 @@ impl Renderer  {
         let vmin = v1.transform(self.screen_space_matrix()).perspective_divide();
         let vmid = v2.transform(self.screen_space_matrix()).perspective_divide();
         let vmax = v3.transform(self.screen_space_matrix()).perspective_divide();
-        
+
         let (vmin, vmax) = if vmin.y() > vmax.y() { (vmax, vmin) } else { (vmin, vmax) };
         let (vmid, vmin) = if vmid.y() < vmin.y() { (vmin, vmid) } else { (vmid, vmin) };
         let (vmax, vmid) = if vmax.y() < vmid.y() { (vmid, vmax) } else { (vmax, vmid) };
-        
+
         let vec1_x = vmid.x() - vmax.x();
         let vec1_y = vmid.y() - vmax.y();
         let vec2_x = vmid.x() - vmin.x();
@@ -49,7 +47,7 @@ impl Renderer  {
 
         let det = vec1_x * vec2_y - vec1_y * vec2_x;
         let handedness = if det >= 0.0 { 0 } else { 1 };
-        
+
         self.rasterize_triangle_ordered(vmin, vmid, vmax, handedness);
         self.render_scanbuffer(bitmap, vmin.y().ceil() as u32, vmax.y().ceil() as u32)
     }
@@ -59,7 +57,7 @@ impl Renderer  {
         self.scan_convert_line(v1, v3, hand);
         self.scan_convert_line(v2, v3, 1 - hand);
     }
-    
+
     fn scan_convert_line(&mut self, min_v : Vertex, max_v : Vertex, whichside : u32) {
 
         assert!(whichside == 0 || whichside == 1);
@@ -68,9 +66,9 @@ impl Renderer  {
 
         if yend == ystart {
             return;
-            
+
         }
-        
+
         let xstep : f32 = (max_v.x() - min_v.x()) / (max_v.y() - min_v.y());
         let y_prestep : f32 = (ystart as f32) - min_v.y();
         let mut xcurrent : f32 = min_v.x() + xstep * y_prestep;

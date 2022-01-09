@@ -26,7 +26,7 @@ fn should_stop(event_pump : &mut sdl2::EventPump) -> bool {
             }
             _ => {}
         }
-    } 
+    }
     return false;
 }
 
@@ -55,7 +55,7 @@ pub fn main() {
     let video_subsystem = sdl_context.video().unwrap();
 
     let (res_x, res_y) = resolution(&video_subsystem);
- 
+
     let window: Window = video_subsystem.window("Super starfield", res_x, res_y)
         .position_centered()
         .build()
@@ -83,14 +83,11 @@ pub fn main() {
         let delta =  previous_time.to(current_time);
         previous_time = current_time;
 
-        
+
         let delta_nanos = delta.num_nanoseconds().unwrap();
-        let delta_millis = delta_nanos as f64 / 1_000_000.0;
 
         let angle = deg_to_rad(angle_deg);
         angle_deg = angle_deg + 1.0 ;
-
-        //println!("Angle : {:?} took {:?} ms to render.",  angle_deg, delta_millis);
 
         let background_color = Color::RGB(0, 0, 0);
         bm.clear(background_color);
@@ -98,7 +95,7 @@ pub fn main() {
         if should_stop(&mut event_pump){
             break 'running;
         }
-        
+
         let id = Mat4::identity();
 
 
@@ -117,7 +114,6 @@ pub fn main() {
         bm.present();
 
         let sleep_time : i32 = 16_000_000 - (delta_nanos as i32);
-        // println!("{:?}", sleep_time);
         if sleep_time > 0 {
             ::std::thread::sleep(Duration::new(0,  sleep_time as u32));
         }

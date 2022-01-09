@@ -30,7 +30,6 @@ impl Vertex {
 		self.pos.z as f32
 	}
 
-
 	pub fn perspective_divide(&self) -> Self {
 		let v = glm::vec4(
 			self.pos.x / self.pos.w,
@@ -42,6 +41,6 @@ impl Vertex {
 	}
 
 	pub fn transform(&self, m : glm::Mat4) -> Self {
-		Self::from_vec(m * (self.pos))	
+		Self::from_vec(m * (self.pos))
 	}
 }
