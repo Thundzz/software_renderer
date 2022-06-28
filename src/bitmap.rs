@@ -18,7 +18,8 @@ impl<'b> BitMap<'b> {
     pub fn replace(&mut self, x : u32, y : u32, color : sdl2::pixels::Color) -> &Self {
         let point = sdl2::rect::Point::new(x as i32, y as i32);
         self.canvas.set_draw_color(color);
-        self.canvas.draw_point(point);
+        self.canvas.draw_point(point)
+            .map_err(|err| println!("{:?}", err)).ok();
         return self;
     }
 
