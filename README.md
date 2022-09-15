@@ -17,6 +17,10 @@ Features that I plan on implementing:
 - Ability to assign colors to shapes 
 - Texture mapping
 
+### In macOS : 
+```sh 
+brew install sdl2
+```
 
 
 
