@@ -8,6 +8,6 @@ build = "build.rs"
 [dependencies]
 sdl2 = "0.35.2"
 rand = "0.6.5"
-time = "0.1.42"
+time = "0.2.0"
 nalgebra = "0.31.0"
 nalgebra-glm = "0.3.0"
